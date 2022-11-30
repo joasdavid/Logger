@@ -12,11 +12,11 @@ fun <T> T.logThis(
 
 fun <T> T.logThis(
     tag: String = Logger.tag,
-    channel: Logger.Level = Logger.defaultChannel,
+    level: Logger.Level = Logger.defaultLevel,
     func: (T) -> String
 ): T = this.also {
     val msgToLog = func(it)
-    Logger.log(channel, tag, msgToLog)
+    Logger.log(level, tag, msgToLog)
 }
 
 fun <T> T.logThis(
