@@ -5,13 +5,13 @@ import com.joasvpereira.loggger.contract.DefaultErrorLog
 import com.joasvpereira.loggger.contract.DefaultInfoLog
 import com.joasvpereira.loggger.contract.DefaultVerboseLog
 import com.joasvpereira.loggger.contract.DefaultWarnLog
-import com.joasvpereira.loggger.contract.LogContract
+import com.joasvpereira.loggger.contract.LevelContract
 
 object Logger {
 
     private const val DEFAULT_TAG = "Logger"
 
-    enum class LoggerChannel {
+    enum class Level {
         DEBUG,
         ERROR,
         INFO,
@@ -22,7 +22,7 @@ object Logger {
     var tag = DEFAULT_TAG
     private set
 
-    var defaultChannel = LoggerChannel.VERBOSE
+    var defaultLevel = Level.VERBOSE
     private set
 
     private var debugLog = DefaultDebugLog()
@@ -31,18 +31,18 @@ object Logger {
     private var verboseLog = DefaultVerboseLog()
     private var warnLog = DefaultWarnLog()
 
-    private val channelsState = HashMap<LoggerChannel, Boolean>()
+    private val levelsState = HashMap<Level, Boolean>()
 
     init {
-        channelsState(
+        levelsState(
             isEnabled = true,
-            listOfChannels = LoggerChannel.values().toList()
+            listOflevels = Level.values().toList()
         )
     }
 
     fun config(
         defaultTag: String = DEFAULT_TAG,
-        defaultChannel: LoggerChannel = Logger.defaultChannel,
+        defaultLevel: Level = Logger.defaultLevel,
         debugLog: DefaultDebugLog = Logger.debugLog,
         errorLog: DefaultErrorLog = Logger.errorLog,
         infoLog: DefaultInfoLog = Logger.infoLog,
@@ -50,7 +50,7 @@ object Logger {
         warnLog: DefaultWarnLog = Logger.warnLog,
     ) {
         tag = defaultTag
-        Logger.defaultChannel = defaultChannel
+        Logger.defaultLevel = defaultLevel
         Logger.debugLog = debugLog
         Logger.errorLog = errorLog
         Logger.infoLog = infoLog
@@ -58,39 +58,43 @@ object Logger {
         Logger.warnLog = warnLog
     }
 
-    fun log(tag: String, message: String) {
-        getLogger(defaultChannel)?.log(tag, message)
+    fun log(message: String) {
+        getLogger(defaultLevel)?.log(tag, message)
     }
 
-    fun log(channel: LoggerChannel, tag: String, message: String) {
-        getLogger(channel)?.log(tag, message)
+    fun log(tag: String = this.tag, message: String) {
+        getLogger(defaultLevel)?.log(tag, message)
     }
 
-    private fun getLogger(forChannel: LoggerChannel): LogContract? =
-        if (channelsState[forChannel] == true) {
-            when (forChannel) {
-                LoggerChannel.DEBUG -> debugLog
-                LoggerChannel.ERROR -> errorLog
-                LoggerChannel.INFO -> infoLog
-                LoggerChannel.VERBOSE -> verboseLog
-                LoggerChannel.WARN -> warnLog
+    fun log(level: Level, tag: String, message: String) {
+        getLogger(level)?.log(tag, message)
+    }
+
+    private fun getLogger(forLevel: Level): LevelContract? =
+        if (levelsState[forLevel] == true) {
+            when (forLevel) {
+                Level.DEBUG -> debugLog
+                Level.ERROR -> errorLog
+                Level.INFO -> infoLog
+                Level.VERBOSE -> verboseLog
+                Level.WARN -> warnLog
             }
         } else {
             null
         }
 
-    fun channelsState(
+    fun levelsState(
         isEnabled: Boolean,
-        listOfChannels: Iterable<LoggerChannel> = listOf(
-            LoggerChannel.DEBUG,
-            LoggerChannel.ERROR,
-            LoggerChannel.INFO,
-            LoggerChannel.VERBOSE,
-            LoggerChannel.WARN
+        listOflevels: Iterable<Level> = listOf(
+            Level.DEBUG,
+            Level.ERROR,
+            Level.INFO,
+            Level.VERBOSE,
+            Level.WARN
         )
     ) {
-        listOfChannels.forEach {
-            channelsState[it] =isEnabled
+        listOflevels.forEach {
+            levelsState[it] =isEnabled
         }
     }
 }

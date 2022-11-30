@@ -2,7 +2,7 @@ package com.joasvpereira.loggger.contract
 
 import android.util.Log
 
-class DefaultDebugLog() : DebugLogContract {
+class DefaultDebugLog() : DebugLevelContract {
     override fun log(tag: String, message: String) {
         Log.d(tag, message)
     }
